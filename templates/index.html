@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Cirilo Barber | Ventas e Inventario</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+</head>
+
+<body>
+
+    <!-- MENÚ LATERAL -->
+    <aside class="sidebar" id="sidebar">
+
+        <div class="brand">
+            <img
+                src="{{ url_for('static', filename='logo.jpeg') }}"
+                alt="Cirilo Barber"
+                class="brand-logo"
+            >
+
+            <div>
+                <h1>Cirilo Barber</h1>
+                <p>Ventas e inventario</p>
+            </div>
+        </div>
+
+        <nav class="sidebar-menu">
+
+            <button
+                class="menu-item active"
+                data-seccion="panel"
+            >
+                <span class="menu-icon">⌂</span>
+                <span>Panel principal</span>
+            </button>
+
+            <button
+                class="menu-item"
+                data-seccion="productos"
+            >
+                <span class="menu-icon">▣</span>
+                <span>Productos</span>
+            </button>
+
+            <button
+                class="menu-item"
+                data-seccion="ventas"
+            >
+                <span class="menu-icon">₲</span>
+                <span>Nueva venta</span>
+            </button>
+
+            <button
+                class="menu-item"
+                data-seccion="historial"
+            >
+                <span class="menu-icon">◷</span>
+                <span>Historial</span>
+            </button>
+
+            <button
+                class="menu-item"
+                data-seccion="reportes"
+            >
+                <span class="menu-icon">▥</span>
+                <span>Reportes</span>
+            </button>
+
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="estado-conexion">
+                <span class="estado-punto"></span>
+
+                <div>
+                    <strong>Sistema conectado</strong>
+                    <small>Google Sheets</small>
+                </div>
+            </div>
+        </div>
+
+    </aside>
+
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="main-content">
+
+        <header class="topbar">
+
+            <div class="topbar-title">
+                <button
+                    id="btnMenuMovil"
+                    class="btn-menu-movil"
+                    type="button"
+                >
+                    ☰
+                </button>
+
+                <div>
+                    <p class="topbar-subtitle">
+                        Sistema de gestión
+                    </p>
+
+                    <h2 id="tituloSeccion">
+                        Panel principal
+                    </h2>
+                </div>
+            </div>
+
+            <div class="topbar-date">
+                <span>Fecha</span>
+                <strong id="fechaActual">--/--/----</strong>
+            </div>
+
+        </header>
+
+
+        <!-- PANEL PRINCIPAL -->
+        <section
+            id="seccion-panel"
+            class="seccion active"
+        >
+
+            <div class="welcome-card">
+
+                <div>
+                    <p class="eyebrow">Resumen general</p>
+
+                    <h3>
+                        Control completo de tu negocio
+                    </h3>
+
+                    <p>
+                        Revisá las ventas, las ganancias y el
+                        inventario desde un solo lugar.
+                    </p>
+                </div>
+
+                <button
+                    class="btn btn-gold"
+                    type="button"
+                    onclick="mostrarSeccion('ventas')"
+                >
+                    + Registrar venta
+                </button>
+
+            </div>
+
+
+            <div class="stats-grid">
+
+                <article class="stat-card gold">
+                    <div class="stat-icon">₲</div>
+
+                    <div>
+                        <span>Ventas de hoy</span>
+
+                        <strong id="ventaDia">
+                            0 Gs.
+                        </strong>
+
+                        <small id="cantidadVentasDia">
+                            0 ventas registradas
+                        </small>
+                    </div>
+                </article>
+
+                <article class="stat-card green">
+                    <div class="stat-icon">↗</div>
+
+                    <div>
+                        <span>Ganancia de hoy</span>
+
+                        <strong id="gananciaDia">
+                            0 Gs.
+                        </strong>
+
+                        <small>
+                            Ganancia neta estimada
+                        </small>
+                    </div>
+                </article>
+
+                <article class="stat-card blue">
+                    <div class="stat-icon">▦</div>
+
+                    <div>
+                        <span>Ventas del mes</span>
+
+                        <strong id="ventaMes">
+                            0 Gs.
+                        </strong>
+
+                        <small id="cantidadVentasMes">
+                            0 ventas registradas
+                        </small>
+                    </div>
+                </article>
+
+                <article class="stat-card purple">
+                    <div class="stat-icon">★</div>
+
+                    <div>
+                        <span>Ganancia del mes</span>
+
+                        <strong id="gananciaMes">
+                            0 Gs.
+                        </strong>
+
+                        <small>
+                            Resultado del mes actual
+                        </small>
+                    </div>
+                </article>
+
+            </div>
+
+
+            <div class="dashboard-grid">
+
+                <article class="panel-card">
+
+                    <div class="panel-header">
+                        <div>
+                            <p class="eyebrow">Inventario</p>
+                            <h3>Estado del stock</h3>
+                        </div>
+
+                        <button
+                            class="link-button"
+                            type="button"
+                            onclick="mostrarSeccion('productos')"
+                        >
+                            Ver productos
+                        </button>
+                    </div>
+
+                    <div class="inventory-summary">
+
+                        <div>
+                            <span>Productos</span>
+                            <strong id="productosRegistrados">0</strong>
+                        </div>
+
+                        <div>
+                            <span>Unidades disponibles</span>
+                            <strong id="unidadesStock">0</strong>
+                        </div>
+
+                        <div class="danger-summary">
+                            <span>Stock bajo</span>
+                            <strong id="productosStockBajo">0</strong>
+                        </div>
+
+                    </div>
+
+                    <div class="low-stock-list">
+                        <h4>Productos con stock bajo</h4>
+
+                        <div id="listaStockBajo">
+                            <div class="empty-state compact">
+                                No hay productos registrados.
+                            </div>
+                        </div>
+                    </div>
+
+                </article>
+
+
+                <article class="panel-card">
+
+                    <div class="panel-header">
+                        <div>
+                            <p class="eyebrow">Cobros del día</p>
+                            <h3>Métodos de pago</h3>
+                        </div>
+                    </div>
+
+                    <div class="payment-list">
+
+                        <div class="payment-row">
+                            <div class="payment-name">
+                                <span class="payment-dot efectivo"></span>
+                                Efectivo
+                            </div>
+
+                            <strong id="efectivoDia">
+                                0 Gs.
+                            </strong>
+                        </div>
+
+                        <div class="payment-row">
+                            <div class="payment-name">
+                                <span class="payment-dot transferencia"></span>
+                                Transferencia
+                            </div>
+
+                            <strong id="transferenciaDia">
+                                0 Gs.
+                            </strong>
+                        </div>
+
+                        <div class="payment-row">
+                            <div class="payment-name">
+                                <span class="payment-dot tarjeta"></span>
+                                Tarjeta
+                            </div>
+
+                            <strong id="tarjetaDia">
+                                0 Gs.
+                            </strong>
+                        </div>
+
+                    </div>
+
+                    <div class="quick-actions">
+
+                        <button
+                            class="quick-action"
+                            type="button"
+                            onclick="abrirModalProducto()"
+                        >
+                            <span>＋</span>
+
+                            <div>
+                                <strong>Nuevo producto</strong>
+                                <small>Agregar al inventario</small>
+                            </div>
+                        </button>
+
+                        <button
+                            class="quick-action"
+                            type="button"
+                            onclick="mostrarSeccion('ventas')"
+                        >
+                            <span>₲</span>
+
+                            <div>
+                                <strong>Nueva venta</strong>
+                                <small>Registrar productos vendidos</small>
+                            </div>
+                        </button>
+
+                    </div>
+
+                </article>
+
+            </div>
+
+        </section>
+
+
+        <!-- PRODUCTOS -->
+        <section
+            id="seccion-productos"
+            class="seccion"
+        >
+
+            <div class="section-heading">
+
+                <div>
+                    <p class="eyebrow">Inventario</p>
+                    <h3>Productos registrados</h3>
+
+                    <p>
+                        Administrá precios, categorías y existencias.
+                    </p>
+                </div>
+
+                <button
+                    class="btn btn-gold"
+                    type="button"
+                    onclick="abrirModalProducto()"
+                >
+                    + Nuevo producto
+                </button>
+
+            </div>
+
+
+            <div class="toolbar">
+
+                <div class="search-box">
+                    <span>⌕</span>
+
+                    <input
+                        id="buscarProducto"
+                        type="search"
+                        placeholder="Buscar por nombre..."
+                    >
+                </div>
+
+                <select id="filtroCategoria">
+                    <option value="">
+                        Todas las categorías
+                    </option>
+                </select>
+
+                <select id="filtroStock">
+                    <option value="">
+                        Todo el stock
+                    </option>
+
+                    <option value="disponible">
+                        Disponible
+                    </option>
+
+                    <option value="bajo">
+                        Stock bajo
+                    </option>
+
+                    <option value="agotado">
+                        Agotado
+                    </option>
+                </select>
+
+            </div>
+
+
+            <div class="table-card">
+
+                <div class="table-responsive">
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Categoría</th>
+                                <th>Compra</th>
+                                <th>Venta</th>
+                                <th>Ganancia</th>
+                                <th>Stock</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="tablaProductos">
+                            <tr>
+                                <td colspan="8">
+                                    <div class="empty-state">
+                                        Cargando productos...
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- NUEVA VENTA -->
+        <section
+            id="seccion-ventas"
+            class="seccion"
+        >
+
+            <div class="section-heading">
+
+                <div>
+                    <p class="eyebrow">Punto de venta</p>
+                    <h3>Registrar nueva venta</h3>
+
+                    <p>
+                        Seleccioná varios productos y confirmá el cobro.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="sales-layout">
+
+                <article class="products-panel">
+
+                    <div class="sales-search">
+                        <span>⌕</span>
+
+                        <input
+                            id="buscarProductoVenta"
+                            type="search"
+                            placeholder="Buscar producto para vender..."
+                        >
+                    </div>
+
+                    <div
+                        id="catalogoVenta"
+                        class="product-catalog"
+                    >
+                        <div class="empty-state">
+                            Cargando productos...
+                        </div>
+                    </div>
+
+                </article>
+
+
+                <aside class="cart-panel">
+
+                    <div class="cart-header">
+
+                        <div>
+                            <p class="eyebrow">Venta actual</p>
+                            <h3>Productos seleccionados</h3>
+                        </div>
+
+                        <button
+                            id="btnVaciarCarrito"
+                            class="link-button danger"
+                            type="button"
+                        >
+                            Vaciar
+                        </button>
+
+                    </div>
+
+                    <div
+                        id="carritoVenta"
+                        class="cart-items"
+                    >
+                        <div class="empty-state compact">
+                            Todavía no agregaste productos.
+                        </div>
+                    </div>
+
+
+                    <div class="payment-method">
+
+                        <label for="metodoPago">
+                            Método de pago
+                        </label>
+
+                        <select id="metodoPago">
+                            <option value="EFECTIVO">
+                                Efectivo
+                            </option>
+
+                            <option value="TRANSFERENCIA">
+                                Transferencia
+                            </option>
+
+                            <option value="TARJETA">
+                                Tarjeta
+                            </option>
+                        </select>
+
+                    </div>
+
+
+                    <div class="cart-summary">
+
+                        <div>
+                            <span>Cantidad de productos</span>
+                            <strong id="cantidadCarrito">0</strong>
+                        </div>
+
+                        <div class="cart-total">
+                            <span>Total a cobrar</span>
+                            <strong id="totalCarrito">0 Gs.</strong>
+                        </div>
+
+                        <div>
+                            <span>Ganancia estimada</span>
+                            <strong id="gananciaCarrito">0 Gs.</strong>
+                        </div>
+
+                    </div>
+
+                    <button
+                        id="btnConfirmarVenta"
+                        class="btn btn-gold btn-block"
+                        type="button"
+                    >
+                        Confirmar venta
+                    </button>
+
+                </aside>
+
+            </div>
+
+        </section>
+
+
+        <!-- HISTORIAL -->
+        <section
+            id="seccion-historial"
+            class="seccion"
+        >
+
+            <div class="section-heading">
+
+                <div>
+                    <p class="eyebrow">Movimientos</p>
+                    <h3>Historial de ventas</h3>
+
+                    <p>
+                        Consultá todas las ventas registradas.
+                    </p>
+                </div>
+
+                <button
+                    id="btnActualizarHistorial"
+                    class="btn btn-outline"
+                    type="button"
+                >
+                    Actualizar
+                </button>
+
+            </div>
+
+
+            <div class="table-card">
+
+                <div class="table-responsive">
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Venta</th>
+                                <th>Fecha</th>
+                                <th>Hora</th>
+                                <th>Método</th>
+                                <th>Productos</th>
+                                <th>Total</th>
+                                <th>Ganancia</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="tablaHistorial">
+                            <tr>
+                                <td colspan="7">
+                                    <div class="empty-state">
+                                        No hay ventas registradas.
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- REPORTES MENSUALES -->
+        <section
+            id="seccion-reportes"
+            class="seccion"
+        >
+
+            <div class="section-heading report-heading">
+                <div>
+                    <p class="eyebrow">Análisis mensual</p>
+                    <h3>Reportes de ventas y ganancias</h3>
+                    <p>
+                        Elegí un mes para revisar sus resultados.
+                    </p>
+                </div>
+
+                <div class="report-filter">
+                    <label for="reporteMes">Mes del reporte</label>
+                    <div>
+                        <input id="reporteMes" type="month">
+                        <button
+                            id="btnCargarReporte"
+                            class="btn btn-gold"
+                            type="button"
+                        >
+                            Ver reporte
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="report-period">
+                Resultados de
+                <strong id="reportePeriodoTexto">--</strong>
+            </div>
+
+            <div class="stats-grid report-stats">
+                <article class="stat-card gold">
+                    <div class="stat-icon">₲</div>
+                    <div>
+                        <span>Total vendido</span>
+                        <strong id="reporteTotalVendido">0 Gs.</strong>
+                        <small id="reporteCantidadVentas">0 ventas</small>
+                    </div>
+                </article>
+
+                <article class="stat-card green">
+                    <div class="stat-icon">↗</div>
+                    <div>
+                        <span>Ganancia</span>
+                        <strong id="reporteGanancia">0 Gs.</strong>
+                        <small>Venta menos costo</small>
+                    </div>
+                </article>
+
+                <article class="stat-card blue">
+                    <div class="stat-icon">▦</div>
+                    <div>
+                        <span>Productos vendidos</span>
+                        <strong id="reporteProductosVendidos">0</strong>
+                        <small>Unidades durante el mes</small>
+                    </div>
+                </article>
+
+                <article class="stat-card purple">
+                    <div class="stat-icon">◎</div>
+                    <div>
+                        <span>Costo de mercadería</span>
+                        <strong id="reporteCostoTotal">0 Gs.</strong>
+                        <small>Inversión recuperada</small>
+                    </div>
+                </article>
+            </div>
+
+            <div class="dashboard-grid report-grid">
+                <article class="panel-card">
+                    <div class="panel-header">
+                        <div>
+                            <p class="eyebrow">Cobros</p>
+                            <h3>Métodos de pago</h3>
+                        </div>
+                    </div>
+
+                    <div class="payment-list report-payments">
+                        <div class="payment-row">
+                            <div class="payment-name">
+                                <span class="payment-dot efectivo"></span>
+                                Efectivo
+                            </div>
+                            <strong id="reporteEfectivo">0 Gs.</strong>
+                        </div>
+                        <div class="payment-row">
+                            <div class="payment-name">
+                                <span class="payment-dot transferencia"></span>
+                                Transferencia
+                            </div>
+                            <strong id="reporteTransferencia">0 Gs.</strong>
+                        </div>
+                        <div class="payment-row">
+                            <div class="payment-name">
+                                <span class="payment-dot tarjeta"></span>
+                                Tarjeta
+                            </div>
+                            <strong id="reporteTarjeta">0 Gs.</strong>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="panel-card">
+                    <div class="panel-header">
+                        <div>
+                            <p class="eyebrow">Ranking</p>
+                            <h3>Productos más vendidos</h3>
+                        </div>
+                    </div>
+
+                    <div id="reporteTopProductos" class="ranking-list">
+                        <div class="empty-state compact">
+                            Seleccioná un mes para ver el ranking.
+                        </div>
+                    </div>
+                </article>
+            </div>
+
+            <div class="table-card report-sales-table">
+                <div class="panel-header report-table-header">
+                    <div>
+                        <p class="eyebrow">Detalle</p>
+                        <h3>Ventas del periodo</h3>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Venta</th>
+                                <th>Fecha</th>
+                                <th>Hora</th>
+                                <th>Método</th>
+                                <th>Productos</th>
+                                <th>Total</th>
+                                <th>Ganancia</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaReporteVentas">
+                            <tr>
+                                <td colspan="7">
+                                    <div class="empty-state">
+                                        No hay datos para mostrar.
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- MODAL PRODUCTO -->
+    <div
+        id="modalProducto"
+        class="modal-overlay"
+    >
+
+        <div class="modal">
+
+            <div class="modal-header">
+
+                <div>
+                    <p class="eyebrow">Inventario</p>
+                    <h3 id="tituloModalProducto">
+                        Registrar producto
+                    </h3>
+                </div>
+
+                <button
+                    class="modal-close"
+                    type="button"
+                    onclick="cerrarModalProducto()"
+                >
+                    ×
+                </button>
+
+            </div>
+
+            <form id="formProducto">
+
+                <input
+                    id="productoId"
+                    type="hidden"
+                >
+
+                <div class="form-group full">
+                    <label for="productoNombre">
+                        Nombre del producto
+                    </label>
+
+                    <input
+                        id="productoNombre"
+                        type="text"
+                        placeholder="Ejemplo: Shampoo profesional"
+                        required
+                    >
+                </div>
+
+                <div class="form-group full">
+                    <label for="productoCategoria">
+                        Categoría
+                    </label>
+
+                    <input
+                        id="productoCategoria"
+                        type="text"
+                        placeholder="Ejemplo: Cuidado personal"
+                        required
+                    >
+                </div>
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+                        <label for="productoCompra">
+                            Precio de compra
+                        </label>
+
+                        <input
+                            id="productoCompra"
+                            type="number"
+                            min="0"
+                            placeholder="0"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="productoVenta">
+                            Precio de venta
+                        </label>
+
+                        <input
+                            id="productoVenta"
+                            type="number"
+                            min="0"
+                            placeholder="0"
+                            required
+                        >
+                    </div>
+
+                    <div
+                        id="grupoStockInicial"
+                        class="form-group"
+                    >
+                        <label for="productoStock">
+                            Stock inicial
+                        </label>
+
+                        <input
+                            id="productoStock"
+                            type="number"
+                            min="0"
+                            placeholder="0"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="productoStockMinimo">
+                            Alerta de stock mínimo
+                        </label>
+
+                        <input
+                            id="productoStockMinimo"
+                            type="number"
+                            min="0"
+                            placeholder="0"
+                            required
+                        >
+                    </div>
+
+                </div>
+
+                <div class="modal-actions">
+
+                    <button
+                        class="btn btn-outline"
+                        type="button"
+                        onclick="cerrarModalProducto()"
+                    >
+                        Cancelar
+                    </button>
+
+                    <button
+                        class="btn btn-gold"
+                        type="submit"
+                    >
+                        Guardar producto
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- MODAL REPOSICIÓN -->
+    <div
+        id="modalReposicion"
+        class="modal-overlay"
+    >
+
+        <div class="modal modal-small">
+
+            <div class="modal-header">
+
+                <div>
+                    <p class="eyebrow">Inventario</p>
+                    <h3>Reponer producto</h3>
+                </div>
+
+                <button
+                    class="modal-close"
+                    type="button"
+                    onclick="cerrarModalReposicion()"
+                >
+                    ×
+                </button>
+
+            </div>
+
+            <form id="formReposicion">
+
+                <input
+                    id="reposicionProductoId"
+                    type="hidden"
+                >
+
+                <div class="selected-product-box">
+                    <span>Producto seleccionado</span>
+
+                    <strong id="reposicionProductoNombre">
+                        Producto
+                    </strong>
+
+                    <small id="reposicionStockActual">
+                        Stock actual: 0
+                    </small>
+                </div>
+
+                <div class="form-group full">
+                    <label for="reposicionCantidad">
+                        Cantidad que ingresa
+                    </label>
+
+                    <input
+                        id="reposicionCantidad"
+                        type="number"
+                        min="1"
+                        placeholder="0"
+                        required
+                    >
+                </div>
+
+                <div class="form-group full">
+                    <label for="reposicionPrecioCompra">
+                        Nuevo precio de compra
+                    </label>
+
+                    <input
+                        id="reposicionPrecioCompra"
+                        type="number"
+                        min="0"
+                        placeholder="Dejar igual"
+                    >
+                </div>
+
+                <div class="modal-actions">
+
+                    <button
+                        class="btn btn-outline"
+                        type="button"
+                        onclick="cerrarModalReposicion()"
+                    >
+                        Cancelar
+                    </button>
+
+                    <button
+                        class="btn btn-gold"
+                        type="submit"
+                    >
+                        Confirmar reposición
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- MENSAJES -->
+    <div id="toastContainer" class="toast-container"></div>
+
+
+    <script
+        src="{{ url_for('static', filename='app.js') }}"
+    ></script>
+
+</body>
+</html>
