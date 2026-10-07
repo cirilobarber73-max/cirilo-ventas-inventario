@@ -7,7 +7,7 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>Cirilo Barber | Ventas e Inventario</title>
+    <title>Cirilo | Ventas e Inventario</title>
 
     <link
         rel="stylesheet"
@@ -23,12 +23,12 @@
         <div class="brand">
             <img
                 src="{{ url_for('static', filename='logo.jpeg') }}"
-                alt="Cirilo Barber"
+                alt="Cirilo"
                 class="brand-logo"
             >
 
             <div>
-                <h1>Cirilo Barber</h1>
+                <h1>Cirilo</h1>
                 <p>Ventas e inventario</p>
             </div>
         </div>
@@ -395,7 +395,7 @@
                     <input
                         id="buscarProducto"
                         type="search"
-                        placeholder="Buscar por nombre..."
+                        placeholder="Buscar por código o nombre..."
                     >
                 </div>
 
@@ -492,7 +492,7 @@
                         <input
                             id="buscarProductoVenta"
                             type="search"
-                            placeholder="Buscar producto para vender..."
+                            placeholder="Escribí el código (ej. FC_001) o buscá por nombre..."
                         >
                     </div>
 
@@ -854,6 +854,19 @@
                 >
 
                 <div class="form-group full">
+                    <label for="productoCodigo">
+                        Código del producto
+                    </label>
+
+                    <input
+                        id="productoCodigo"
+                        type="text"
+                        placeholder="Ej.: FC_001"
+                        maxlength="30"
+                        autocomplete="off"
+                        required
+                    >
+
                     <label for="productoNombre">
                         Nombre del producto
                     </label>

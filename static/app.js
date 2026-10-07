@@ -68,6 +68,31 @@ function configurarEventos() {
         .addEventListener("input", renderizarCatalogo);
 
     document
+        .getElementById("buscarProductoVenta")
+        .addEventListener("keydown", (evento) => {
+            if (evento.key !== "Enter") return;
+
+            evento.preventDefault();
+            const campo = evento.currentTarget;
+            const buscado = campo.value.trim().toUpperCase();
+            if (!buscado) return;
+
+            const producto = productos.find(
+                (item) => String(item.codigo || "").toUpperCase() === buscado
+            );
+
+            if (!producto) {
+                mostrarToast("No existe un producto con ese código.", "error");
+                return;
+            }
+
+            agregarAlCarrito(producto.id_producto);
+            campo.value = "";
+            renderizarCatalogo();
+            campo.focus();
+        });
+
+    document
         .getElementById("formProducto")
         .addEventListener("submit", guardarProducto);
 
@@ -323,6 +348,10 @@ function obtenerProductosFiltrados() {
             .toLowerCase()
             .includes(busqueda);
 
+        const coincideCodigo = String(producto.codigo || "")
+            .toLowerCase()
+            .includes(busqueda);
+
         const coincideCategoria =
             !categoria || producto.categoria === categoria;
 
@@ -331,7 +360,7 @@ function obtenerProductosFiltrados() {
             || obtenerEstadoProducto(producto) === filtroStock;
 
         return (
-            coincideNombre
+            (coincideNombre || coincideCodigo)
             && coincideCategoria
             && coincideStock
         );
@@ -384,7 +413,7 @@ function renderizarProductos() {
                         </strong>
 
                         <small>
-                            ${escaparHTML(producto.id_producto)}
+                            Código: ${escaparHTML(producto.codigo || "SIN CÓDIGO")}
                         </small>
                     </div>
                 </td>
@@ -502,6 +531,9 @@ function editarProducto(idProducto) {
     document.getElementById("productoId").value =
         producto.id_producto;
 
+    document.getElementById("productoCodigo").value =
+        producto.codigo || "";
+
     document.getElementById("productoNombre").value =
         producto.nombre;
 
@@ -538,18 +570,29 @@ async function guardarProducto(evento) {
         document.getElementById("productoId").value;
 
     const datos = {
+        codigo:
+            document
+                .getElementById("productoCodigo")
+                .value
+                .trim()
+                .toUpperCase(),
+
         nombre:
-            document.getElementById("productoNombre").value,
+            document.getElementById("productoNombre").value.trim(),
+
         categoria:
-            document.getElementById("productoCategoria").value,
+            document.getElementById("productoCategoria").value.trim(),
+
         precio_compra:
             Number(
                 document.getElementById("productoCompra").value
             ),
+
         precio_venta:
             Number(
                 document.getElementById("productoVenta").value
             ),
+
         stock_minimo:
             Number(
                 document
@@ -557,6 +600,14 @@ async function guardarProducto(evento) {
                     .value
             )
     };
+
+    if (!datos.codigo) {
+        mostrarToast(
+            "Ingresá el código del producto.",
+            "error"
+        );
+        return;
+    }
 
     if (!idProducto) {
         datos.stock_actual = Number(
@@ -597,7 +648,6 @@ async function guardarProducto(evento) {
         mostrarToast(error.message, "error");
     }
 }
-
 
 async function eliminarProducto(idProducto) {
     const producto = productos.find(
@@ -728,11 +778,11 @@ function renderizarCatalogo() {
         .trim()
         .toLowerCase();
 
-    const lista = productos.filter((producto) =>
-        String(producto.nombre)
-            .toLowerCase()
-            .includes(busqueda)
-    );
+    const lista = productos.filter((producto) => {
+        const nombre = String(producto.nombre || "").toLowerCase();
+        const codigo = String(producto.codigo || "").toLowerCase();
+        return nombre.includes(busqueda) || codigo.includes(busqueda);
+    });
 
     if (!lista.length) {
         contenedor.innerHTML = `
@@ -758,6 +808,10 @@ function renderizarCatalogo() {
                 <h4>
                     ${escaparHTML(producto.nombre)}
                 </h4>
+
+                <span class="catalog-product-code">
+                    ${escaparHTML(producto.codigo || "SIN CÓDIGO")}
+                </span>
 
                 <span class="catalog-product-stock">
                     Stock disponible: ${producto.stock_actual}
@@ -817,6 +871,7 @@ function agregarAlCarrito(idProducto) {
     } else {
         carrito.push({
             id_producto: producto.id_producto,
+            codigo: producto.codigo || "",
             nombre: producto.nombre,
             precio_compra: Number(producto.precio_compra),
             precio_venta: Number(producto.precio_venta),
@@ -893,6 +948,7 @@ function sincronizarCarrito() {
 
             return {
                 ...item,
+                codigo: productoActual.codigo || "",
                 nombre: productoActual.nombre,
                 precio_compra:
                     Number(productoActual.precio_compra),
@@ -934,6 +990,10 @@ function renderizarCarrito() {
         <div class="cart-item">
             <div>
                 <h4>${escaparHTML(item.nombre)}</h4>
+
+                <small class="cart-product-code">
+                    ${escaparHTML(item.codigo || "SIN CÓDIGO")}
+                </small>
 
                 <small>
                     ${formatearGs(item.precio_venta)}

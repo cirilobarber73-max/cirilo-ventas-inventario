@@ -60,6 +60,26 @@ def buscar_producto(id_producto):
     return hoja, None, None
 
 
+def normalizar_codigo(codigo):
+    return str(codigo or "").strip().upper().replace(" ", "")
+
+
+def codigo_repetido(codigo, ignorar_id=None):
+    codigo_buscado = normalizar_codigo(codigo)
+    if not codigo_buscado:
+        return False
+
+    for producto in obtener_registros("PRODUCTOS"):
+        mismo_codigo = normalizar_codigo(producto.get("CODIGO")) == codigo_buscado
+        id_diferente = (
+            ignorar_id is None
+            or str(producto.get("ID_PRODUCTO")) != str(ignorar_id)
+        )
+        if mismo_codigo and id_diferente:
+            return True
+    return False
+
+
 def producto_repetido(nombre, ignorar_id=None):
     registros = obtener_registros("PRODUCTOS")
     nombre_buscado = nombre.strip().lower()
@@ -133,6 +153,7 @@ def listar_productos():
 
             resultado.append({
                 "id_producto": producto.get("ID_PRODUCTO"),
+                "codigo": normalizar_codigo(producto.get("CODIGO")),
                 "nombre": producto.get("NOMBRE"),
                 "categoria": producto.get("CATEGORIA"),
                 "precio_compra": convertir_numero(
@@ -175,6 +196,8 @@ def registrar_producto():
     try:
         datos = request.get_json(silent=True) or {}
 
+        codigo = normalizar_codigo(datos.get("codigo"))
+        codigo = normalizar_codigo(datos.get("codigo"))
         nombre = str(datos.get("nombre", "")).strip()
         categoria = str(datos.get("categoria", "")).strip()
         precio_compra = convertir_numero(
@@ -189,6 +212,18 @@ def registrar_producto():
         stock_minimo = convertir_numero(
             datos.get("stock_minimo")
         )
+
+        if not codigo:
+            return jsonify({
+                "ok": False,
+                "mensaje": "El código del producto es obligatorio."
+            }), 400
+
+        if codigo_repetido(codigo):
+            return jsonify({
+                "ok": False,
+                "mensaje": "Ya existe un producto con ese código."
+            }), 409
 
         if not nombre:
             return jsonify({
@@ -242,6 +277,7 @@ def registrar_producto():
             estado,
             ahora.strftime("%Y-%m-%d %H:%M:%S"),
             ahora.strftime("%Y-%m-%d %H:%M:%S"),
+            codigo,
         ])
         invalidar_cache("PRODUCTOS")
 
@@ -290,11 +326,17 @@ def editar_producto(id_producto):
             producto.get("STOCK_ACTUAL")
         )
 
-        if not nombre or not categoria:
+        if not codigo or not nombre or not categoria:
             return jsonify({
                 "ok": False,
-                "mensaje": "Nombre y categoría son obligatorios."
+                "mensaje": "Código, nombre y categoría son obligatorios."
             }), 400
+
+        if codigo_repetido(codigo, id_producto):
+            return jsonify({
+                "ok": False,
+                "mensaje": "Ya existe otro producto con ese código."
+            }), 409
 
         if precio_compra < 0 or precio_venta < 0:
             return jsonify({
@@ -328,6 +370,11 @@ def editar_producto(id_producto):
                 fecha_actual().strftime("%Y-%m-%d %H:%M:%S"),
             ]]
         )
+        hoja.update(
+            range_name=f"K{numero_fila}",
+            values=[[codigo]]
+        )
+
         invalidar_cache("PRODUCTOS")
 
         return jsonify({

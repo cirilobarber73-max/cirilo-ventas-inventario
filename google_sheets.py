@@ -19,7 +19,7 @@ HOJAS = {
     "PRODUCTOS": [
         "ID_PRODUCTO", "NOMBRE", "CATEGORIA", "PRECIO_COMPRA",
         "PRECIO_VENTA", "STOCK_ACTUAL", "STOCK_MINIMO", "ESTADO",
-        "FECHA_CREACION", "ULTIMA_ACTUALIZACION",
+        "FECHA_CREACION", "ULTIMA_ACTUALIZACION", "CODIGO",
     ],
     "VENTAS": [
         "ID_VENTA", "FECHA", "HORA", "METODO_PAGO", "TOTAL_VENTA",
@@ -138,6 +138,21 @@ def inicializar_hojas():
             hoja.append_row(encabezados)
         elif not hoja.row_values(1):
             hoja.append_row(encabezados)
+        else:
+            # Migración segura: agrega encabezados nuevos al final
+            # sin mover ni borrar las columnas existentes.
+            encabezados_actuales = hoja.row_values(1)
+            faltantes = [
+                encabezado
+                for encabezado in encabezados
+                if encabezado not in encabezados_actuales
+            ]
+            if faltantes:
+                hoja.update(
+                    range_name=f"{gspread.utils.rowcol_to_a1(1, len(encabezados_actuales) + 1)}:"
+                               f"{gspread.utils.rowcol_to_a1(1, len(encabezados_actuales) + len(faltantes))}",
+                    values=[faltantes],
+                )
 
         _hojas[nombre] = hoja
 
