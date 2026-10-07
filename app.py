@@ -311,21 +311,28 @@ def editar_producto(id_producto):
                 "mensaje": "Producto no encontrado."
             }), 404
 
+        # Datos recibidos
+        codigo = normalizar_codigo(datos.get("codigo"))
         nombre = str(datos.get("nombre", "")).strip()
         categoria = str(datos.get("categoria", "")).strip()
+
         precio_compra = convertir_numero(
             datos.get("precio_compra")
         )
+
         precio_venta = convertir_numero(
             datos.get("precio_venta")
         )
+
         stock_minimo = convertir_numero(
             datos.get("stock_minimo")
         )
+
         stock_actual = convertir_numero(
             producto.get("STOCK_ACTUAL")
         )
 
+        # Validaciones
         if not codigo or not nombre or not categoria:
             return jsonify({
                 "ok": False,
@@ -350,12 +357,14 @@ def editar_producto(id_producto):
                 "mensaje": "Ya existe otro producto con ese nombre."
             }), 409
 
+        # Estado del producto
         estado = (
             "STOCK BAJO"
             if stock_actual <= stock_minimo
             else "DISPONIBLE"
         )
 
+        # Actualizar datos principales
         hoja.update(
             range_name=f"B{numero_fila}:J{numero_fila}",
             values=[[
@@ -370,6 +379,8 @@ def editar_producto(id_producto):
                 fecha_actual().strftime("%Y-%m-%d %H:%M:%S"),
             ]]
         )
+
+        # Actualizar código del producto
         hoja.update(
             range_name=f"K{numero_fila}",
             values=[[codigo]]
@@ -387,7 +398,6 @@ def editar_producto(id_producto):
             "ok": False,
             "mensaje": str(error)
         }), 500
-
 
 # ==========================================
 # ELIMINAR PRODUCTO
